@@ -6,14 +6,20 @@ export async function PATCH(
   _request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-  const orderId = parseInt(id, 10);
-  const ordersRepository = new OrdersRepository();
-  const robotsRepository = new RobotsRepository();
-  const ordersController = new OrdersController(
-    ordersRepository,
-    robotsRepository
-  );
-  const order = await ordersController.changeStatus(orderId);
-  return Response.json(order, { status: 200 });
+  try {
+    const { id } = await context.params;
+    const orderId = parseInt(id, 10);
+    const ordersRepository = new OrdersRepository();
+    const robotsRepository = new RobotsRepository();
+    const ordersController = new OrdersController(
+      ordersRepository,
+      robotsRepository
+    );
+    const order = await ordersController.changeStatus(orderId);
+    return Response.json(order, { status: 200 });
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unexpected Error";
+    return Response.json({ error: errorMessage }, { status: 400 });
+  }
 }

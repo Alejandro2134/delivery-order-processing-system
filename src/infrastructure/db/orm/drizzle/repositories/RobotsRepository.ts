@@ -53,6 +53,7 @@ export class RobotsRepository implements IRobotsRepository {
       .select()
       .from(robotsTable)
       .where(eq(robotsTable.id, id));
+
     if (rows.length === 0) return null;
     const row = rows[0];
 
@@ -60,7 +61,11 @@ export class RobotsRepository implements IRobotsRepository {
   }
 
   async getRobots(): Promise<Robot[]> {
-    const rows = await this.db.select().from(robotsTable);
+    const rows = await this.db
+      .select()
+      .from(robotsTable)
+      .orderBy(robotsTable.id);
+
     return rows.map((row) => {
       const robot = this.mapRowToRobot(row);
       return robot;

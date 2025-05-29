@@ -6,7 +6,7 @@ export class DeliveredState implements OrderState {
   next(order: Order, robot: Robot): void {
     order.setStatus("completed");
     robot.setLastKnownLocation("Kiwibot HQ");
-    robot.changeStatus("available");
+    robot.setStatus("available");
     order.setCompletedAt(new Date());
   }
 }

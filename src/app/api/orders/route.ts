@@ -4,24 +4,36 @@ import { OrdersRepository } from "@/infrastructure/db/orm/drizzle/repositories/O
 import { RobotsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RobotsRepository";
 
 export async function GET() {
-  const ordersRepository = new OrdersRepository();
-  const robotsRepository = new RobotsRepository();
-  const ordersController = new OrdersController(
-    ordersRepository,
-    robotsRepository
-  );
-  const orders = await ordersController.list();
-  return Response.json(orders, { status: 200 });
+  try {
+    const ordersRepository = new OrdersRepository();
+    const robotsRepository = new RobotsRepository();
+    const ordersController = new OrdersController(
+      ordersRepository,
+      robotsRepository
+    );
+    const orders = await ordersController.list();
+    return Response.json(orders, { status: 200 });
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unexpected Error";
+    return Response.json({ error: errorMessage }, { status: 400 });
+  }
 }
 
 export async function POST(request: Request) {
-  const body: OrderAPI = await request.json();
-  const ordersRepository = new OrdersRepository();
-  const robotsRepository = new RobotsRepository();
-  const ordersController = new OrdersController(
-    ordersRepository,
-    robotsRepository
-  );
-  const order = await ordersController.create(body);
-  return Response.json(order, { status: 201 });
+  try {
+    const body: OrderAPI = await request.json();
+    const ordersRepository = new OrdersRepository();
+    const robotsRepository = new RobotsRepository();
+    const ordersController = new OrdersController(
+      ordersRepository,
+      robotsRepository
+    );
+    const order = await ordersController.create(body);
+    return Response.json(order, { status: 201 });
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unexpected Error";
+    return Response.json({ error: errorMessage }, { status: 400 });
+  }
 }

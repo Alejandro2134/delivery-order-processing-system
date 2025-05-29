@@ -49,7 +49,7 @@ export class Robot {
     if (this.status === newStatus)
       throw new Error(`Robot is already in status ${newStatus}`);
 
-    if (this.status === "busy" && newStatus !== "available")
+    if (this.status === "busy")
       throw new Error(`Cannot change status from busy to ${newStatus}`);
 
     this.status = newStatus;

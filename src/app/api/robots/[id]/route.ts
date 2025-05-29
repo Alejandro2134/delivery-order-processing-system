@@ -3,12 +3,19 @@ import { RobotsRepository } from "@/infrastructure/db/orm/drizzle/repositories/R
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { status } = await request.json();
-  const robotId = parseInt(context.params.id, 10);
-  const robotsRepository = new RobotsRepository();
-  const robotsController = new RobotsController(robotsRepository);
-  const robot = await robotsController.changeStatus(robotId, status || "");
-  return Response.json(robot, { status: 200 });
+  try {
+    const { id } = await context.params;
+    const { status } = await request.json();
+    const robotId = parseInt(id, 10);
+    const robotsRepository = new RobotsRepository();
+    const robotsController = new RobotsController(robotsRepository);
+    const robot = await robotsController.changeStatus(robotId, status || "");
+    return Response.json(robot, { status: 200 });
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unexpected Error";
+    return Response.json({ error: errorMessage }, { status: 400 });
+  }
 }

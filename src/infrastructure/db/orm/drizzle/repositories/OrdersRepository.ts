@@ -175,7 +175,8 @@ export class OrdersRepository implements IOrdersRepository {
         restaurantTable,
         eq(ordersTable.restaurantId, restaurantTable.id)
       )
-      .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id));
+      .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id))
+      .orderBy(ordersTable.id);
 
     const ordersMap = new Map<number, Order>();
 

@@ -6,6 +6,6 @@ export class PendingState implements OrderState {
   next(order: Order, robot: Robot): void {
     order.setRobotId(robot.getId());
     order.setStatus("assigned");
-    robot.changeStatus("busy");
+    robot.setStatus("busy");
   }
 }
