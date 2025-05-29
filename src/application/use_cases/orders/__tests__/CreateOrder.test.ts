@@ -3,7 +3,7 @@ import { CreateOrder } from "../CreateOrder";
 import { Order } from "@/domain/entities/Order";
 
 describe("Create order use case", () => {
-  it("should create a order and create the created order", async () => {
+  it("should create a order and return the created order", async () => {
     //Arrange
     const order = new Order({ clientId: 1, items: [], restaurantId: 1 });
 
