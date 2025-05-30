@@ -4,13 +4,13 @@ import { restaurantTable } from "@/infrastructure/db/orm/drizzle/schema/restaura
 import { seed } from "drizzle-seed";
 
 async function pupulateDb() {
-  const existingClients = await db.select().from(clientsTable).limit(1);
+  const existingClients = await db().select().from(clientsTable).limit(1);
   if (existingClients.length > 0) {
     console.log("Database already populated with clients.");
     return;
   }
 
-  await seed(db, { clientsTable, restaurantTable }).refine((f) => ({
+  await seed(db(), { clientsTable, restaurantTable }).refine((f) => ({
     clientsTable: {
       columns: {
         phoneNumber: f.phoneNumber(),

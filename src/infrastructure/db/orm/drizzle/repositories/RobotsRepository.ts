@@ -16,7 +16,7 @@ export class RobotsRepository implements IRobotsRepository {
   private db: NodePgDatabase;
 
   constructor() {
-    this.db = db;
+    this.db = db();
   }
 
   async getAvailableRobot(): Promise<Robot | null> {

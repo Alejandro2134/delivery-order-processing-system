@@ -42,7 +42,7 @@ export class OrdersRepository implements IOrdersRepository {
   private db: NodePgDatabase;
 
   constructor() {
-    this.db = db;
+    this.db = db();
   }
 
   async updateOrder(order: Order, id: number): Promise<Order> {
@@ -149,50 +149,55 @@ export class OrdersRepository implements IOrdersRepository {
   }
 
   async getOrders(): Promise<Order[]> {
-    const rows = await this.db
-      .select({
-        orders: { ...ordersTable },
-        order_items: {
-          description: orderItemsTable.description,
-          unitPrice: orderItemsTable.unitPrice,
-          quantity: orderItemsTable.quantity,
-        },
-        client: {
-          firstName: clientsTable.firstName,
-          lastName: clientsTable.lastName,
-          address: clientsTable.address,
-        },
-        restaurant: {
-          name: restaurantTable.name,
-          address: restaurantTable.address,
-        },
-        robot: { robotId: robotsTable.robotId },
-      })
-      .from(ordersTable)
-      .leftJoin(orderItemsTable, eq(ordersTable.id, orderItemsTable.orderId))
-      .leftJoin(clientsTable, eq(ordersTable.clientId, clientsTable.id))
-      .leftJoin(
-        restaurantTable,
-        eq(ordersTable.restaurantId, restaurantTable.id)
-      )
-      .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id))
-      .orderBy(ordersTable.id);
+    try {
+      const rows = await this.db
+        .select({
+          orders: { ...ordersTable },
+          order_items: {
+            description: orderItemsTable.description,
+            unitPrice: orderItemsTable.unitPrice,
+            quantity: orderItemsTable.quantity,
+          },
+          client: {
+            firstName: clientsTable.firstName,
+            lastName: clientsTable.lastName,
+            address: clientsTable.address,
+          },
+          restaurant: {
+            name: restaurantTable.name,
+            address: restaurantTable.address,
+          },
+          robot: { robotId: robotsTable.robotId },
+        })
+        .from(ordersTable)
+        .leftJoin(orderItemsTable, eq(ordersTable.id, orderItemsTable.orderId))
+        .leftJoin(clientsTable, eq(ordersTable.clientId, clientsTable.id))
+        .leftJoin(
+          restaurantTable,
+          eq(ordersTable.restaurantId, restaurantTable.id)
+        )
+        .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id))
+        .orderBy(ordersTable.id);
 
-    const ordersMap = new Map<number, Order>();
+      const ordersMap = new Map<number, Order>();
 
-    for (const row of rows) {
-      const order = row.orders;
-      const item = row.order_items;
+      for (const row of rows) {
+        const order = row.orders;
+        const item = row.order_items;
 
-      if (!ordersMap.has(order.id)) {
-        const mappedOrder = this.mapRowToOrder(row);
-        ordersMap.set(order.id, mappedOrder);
+        if (!ordersMap.has(order.id)) {
+          const mappedOrder = this.mapRowToOrder(row);
+          ordersMap.set(order.id, mappedOrder);
+        }
+
+        if (item) ordersMap.get(order.id)!.getItems().push(item);
       }
 
-      if (item) ordersMap.get(order.id)!.getItems().push(item);
+      return Array.from(ordersMap.values());
+    } catch (err) {
+      console.log(err);
+      throw new Error("Error");
     }
-
-    return Array.from(ordersMap.values());
   }
 
   mapRowToOrder(row: OrderRow): Order {
