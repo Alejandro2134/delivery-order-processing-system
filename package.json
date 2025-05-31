@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "npx tsx scripts/seed.ts",
     "test": "jest"
   },
   "dependencies": {
@@ -33,7 +32,6 @@
     "jest": "^29.7.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.3.4",
-    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }
