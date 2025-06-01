@@ -3,6 +3,7 @@ import { IRobotsRepository } from "@/domain/repositories/IRobotsRepository";
 import { ChangeStatus } from "../ChangeStatus";
 import { Order } from "@/domain/entities/Order";
 import { Robot } from "@/domain/entities/Robot";
+import { ITransactionsRepository } from "@/domain/repositories/ITransactionsRepository";
 
 describe("Change status use case", () => {
   it("should change the status of an order if the order already has a robot assigned", async () => {
@@ -25,15 +26,24 @@ describe("Change status use case", () => {
       getRobots: jest.fn(),
       updateRobot: jest.fn(),
     };
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
 
-    const useCase = new ChangeStatus(ordersRepository, robotsRepository);
+    const useCase = new ChangeStatus(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act
     const updatedOrder = await useCase.execute(1);
 
     //Assert
     expect(updatedOrder.getStatus()).toBe("assigned");
-    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1);
+    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1, undefined);
     expect(robotsRepository.updateRobot).toHaveBeenCalledTimes(1);
     expect(ordersRepository.updateOrder).toHaveBeenCalledTimes(1);
     expect(robotsRepository.getRobot).toHaveBeenCalledTimes(1);
@@ -57,15 +67,24 @@ describe("Change status use case", () => {
       getRobots: jest.fn(),
       updateRobot: jest.fn(),
     };
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
 
-    const useCase = new ChangeStatus(ordersRepository, robotsRepository);
+    const useCase = new ChangeStatus(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act
     const updatedOrder = await useCase.execute(1);
 
     //Assert
     expect(updatedOrder.getStatus()).toBe("assigned");
-    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1);
+    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1, undefined);
     expect(robotsRepository.updateRobot).toHaveBeenCalledTimes(1);
     expect(ordersRepository.updateOrder).toHaveBeenCalledTimes(1);
     expect(robotsRepository.getAvailableRobot).toHaveBeenCalledTimes(1);
@@ -86,8 +105,17 @@ describe("Change status use case", () => {
       getRobots: jest.fn(),
       updateRobot: jest.fn(),
     };
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
 
-    const useCase = new ChangeStatus(ordersRepository, robotsRepository);
+    const useCase = new ChangeStatus(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(
@@ -113,8 +141,17 @@ describe("Change status use case", () => {
       getRobots: jest.fn(),
       updateRobot: jest.fn(),
     };
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
 
-    const useCase = new ChangeStatus(ordersRepository, robotsRepository);
+    const useCase = new ChangeStatus(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(
@@ -139,8 +176,17 @@ describe("Change status use case", () => {
       getRobots: jest.fn(),
       updateRobot: jest.fn(),
     };
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
 
-    const useCase = new ChangeStatus(ordersRepository, robotsRepository);
+    const useCase = new ChangeStatus(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(

@@ -1,13 +1,17 @@
 import { IOrdersRepository } from "@/domain/repositories/IOrdersRepository";
 import { Order } from "@/domain/entities/Order";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import {
+  NodePgDatabase,
+  NodePgQueryResultHKT,
+} from "drizzle-orm/node-postgres";
 import { ordersTable } from "../schema/order";
 import { orderItemsTable } from "../schema/orderItems";
-import { eq } from "drizzle-orm";
+import { eq, ExtractTablesWithRelations } from "drizzle-orm";
 import { db } from "..";
 import { clientsTable } from "../schema/client";
 import { restaurantTable } from "../schema/restaurant";
 import { robotsTable } from "../schema/robot";
+import { PgTransaction } from "drizzle-orm/pg-core";
 
 type OrderRow = {
   orders: {
@@ -45,8 +49,18 @@ export class OrdersRepository implements IOrdersRepository {
     this.db = db();
   }
 
-  async updateOrder(order: Order, id: number): Promise<Order> {
-    const updatedOrders = await this.db
+  async updateOrder(
+    order: Order,
+    id: number,
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Order> {
+    const exec = tx ?? this.db;
+
+    const updatedOrders = await exec
       .update(ordersTable)
       .set({
         robotId: order.getRobotId(),
@@ -60,15 +74,24 @@ export class OrdersRepository implements IOrdersRepository {
       throw new Error(`Order with id ${id} not found`);
 
     const updatedOrder = updatedOrders[0];
-    const getOrder = await this.getOrder(updatedOrder.id);
+    const getOrder = await this.getOrder(updatedOrder.id, tx);
 
     if (!getOrder) throw new Error("Order not found");
 
     return getOrder;
   }
 
-  async getOrder(id: number): Promise<Order | null> {
-    const rows = await this.db
+  async getOrder(
+    id: number,
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Order | null> {
+    const exec = tx ?? this.db;
+
+    const rows = await exec
       .select({
         orders: { ...ordersTable },
         order_items: {
@@ -95,7 +118,8 @@ export class OrdersRepository implements IOrdersRepository {
         restaurantTable,
         eq(ordersTable.restaurantId, restaurantTable.id)
       )
-      .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id));
+      .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id))
+      .for("update", { of: ordersTable });
 
     if (rows.length === 0) return null;
 
