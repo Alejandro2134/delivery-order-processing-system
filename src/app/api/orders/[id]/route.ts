@@ -1,5 +1,7 @@
 import { OrdersController } from "@/adapters/controllers/OrdersController";
+import { ClientsRepository } from "@/infrastructure/db/orm/drizzle/repositories/ClientsRepository";
 import { OrdersRepository } from "@/infrastructure/db/orm/drizzle/repositories/OrdersRepository";
+import { RestaurantsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RestaurantsRepository";
 import { RobotsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RobotsRepository";
 
 export async function PATCH(
@@ -11,9 +13,13 @@ export async function PATCH(
     const orderId = parseInt(id, 10);
     const ordersRepository = new OrdersRepository();
     const robotsRepository = new RobotsRepository();
+    const clientsRepository = new ClientsRepository();
+    const restaurantsRepository = new RestaurantsRepository();
     const ordersController = new OrdersController(
       ordersRepository,
-      robotsRepository
+      robotsRepository,
+      clientsRepository,
+      restaurantsRepository
     );
     const order = await ordersController.assignRobot(orderId);
     return Response.json(order, { status: 200 });

@@ -11,15 +11,13 @@ export class ChangeStatus {
   }
 
   async execute(id: number, newStatus: string) {
-    const normalizedStatus = newStatus.toLowerCase() as RobotStatus;
-
-    if (!AVAILABLE_STATUS.includes(normalizedStatus))
+    if (!AVAILABLE_STATUS.includes(newStatus as RobotStatus))
       throw new Error(`Invalid status: ${newStatus}`);
 
     const robot = await this.robotsRepository.getRobot(id);
     if (!robot) throw new Error(`Robot with id ${id} not found`);
 
-    robot.changeStatus(normalizedStatus);
+    robot.changeStatus(newStatus as RobotStatus);
     return await this.robotsRepository.updateRobot(robot, id);
   }
 }
