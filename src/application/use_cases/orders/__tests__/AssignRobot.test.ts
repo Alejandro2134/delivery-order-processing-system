@@ -3,6 +3,7 @@ import { IRobotsRepository } from "@/domain/repositories/IRobotsRepository";
 import { AssignRobot } from "../AssignRobot";
 import { Order } from "@/domain/entities/Order";
 import { Robot } from "@/domain/entities/Robot";
+import { ITransactionsRepository } from "@/domain/repositories/ITransactionsRepository";
 
 describe("Assign robot to order use case", () => {
   it("should assign a robot to a pending order", async () => {
@@ -25,13 +26,23 @@ describe("Assign robot to order use case", () => {
       getRobots: jest.fn(),
     };
 
-    const useCase = new AssignRobot(ordersRepository, robotsRepository);
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
+
+    const useCase = new AssignRobot(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act
     const result = await useCase.execute(1);
 
     //Assert
-    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1);
+    expect(ordersRepository.getOrder).toHaveBeenCalledWith(1, undefined);
     expect(robotsRepository.getAvailableRobot).toHaveBeenCalled();
     expect(order.getRobotId()).toBe(robot.getId());
     expect(order.getStatus()).toBe("assigned");
@@ -56,7 +67,17 @@ describe("Assign robot to order use case", () => {
       getRobots: jest.fn(),
     };
 
-    const useCase = new AssignRobot(ordersRepository, robotsRepository);
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
+
+    const useCase = new AssignRobot(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(
@@ -84,7 +105,17 @@ describe("Assign robot to order use case", () => {
       getRobots: jest.fn(),
     };
 
-    const useCase = new AssignRobot(ordersRepository, robotsRepository);
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
+
+    const useCase = new AssignRobot(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(
@@ -111,7 +142,17 @@ describe("Assign robot to order use case", () => {
       getRobots: jest.fn(),
     };
 
-    const useCase = new AssignRobot(ordersRepository, robotsRepository);
+    const transactionsRepository: ITransactionsRepository = {
+      runInTransaction: async (fn) => {
+        return await fn(undefined);
+      },
+    };
+
+    const useCase = new AssignRobot(
+      ordersRepository,
+      robotsRepository,
+      transactionsRepository
+    );
 
     //Act & Assert
     await expect(useCase.execute(1)).rejects.toThrow(

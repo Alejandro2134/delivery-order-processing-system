@@ -9,29 +9,34 @@ import { ChangeStatus } from "@/application/use_cases/orders/ChangeStatus";
 import { OrderAPI, orderSchema } from "../validators/order.schema";
 import { IClientsRepository } from "@/domain/repositories/IClientsRepository";
 import { IRestaurantsRepository } from "@/domain/repositories/IRestaurantsRepository";
+import { ITransactionsRepository } from "@/domain/repositories/ITransactionsRepository";
 
 export class OrdersController implements CommonOperations<Order, OrderAPI> {
   private ordersRepository: IOrdersRepository;
   private robotsRepository: IRobotsRepository;
   private clientsRepository: IClientsRepository;
   private restaurantsRepository: IRestaurantsRepository;
+  private transactionsRepository: ITransactionsRepository;
 
   constructor(
     ordersRepository: IOrdersRepository,
     robotsRepository: IRobotsRepository,
     clientsRepository: IClientsRepository,
-    restaurantsRepository: IRestaurantsRepository
+    restaurantsRepository: IRestaurantsRepository,
+    transactionsRepository: ITransactionsRepository
   ) {
     this.ordersRepository = ordersRepository;
     this.robotsRepository = robotsRepository;
     this.clientsRepository = clientsRepository;
     this.restaurantsRepository = restaurantsRepository;
+    this.transactionsRepository = transactionsRepository;
   }
 
   assignRobot(orderId: number): Promise<Order> {
     const assignRobot = new AssignRobot(
       this.ordersRepository,
-      this.robotsRepository
+      this.robotsRepository,
+      this.transactionsRepository
     );
 
     return assignRobot.execute(orderId);
@@ -40,7 +45,8 @@ export class OrdersController implements CommonOperations<Order, OrderAPI> {
   changeStatus(orderId: number) {
     const changeStatus = new ChangeStatus(
       this.ordersRepository,
-      this.robotsRepository
+      this.robotsRepository,
+      this.transactionsRepository
     );
 
     return changeStatus.execute(orderId);

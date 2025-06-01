@@ -1,9 +1,13 @@
 import { IRobotsRepository } from "@/domain/repositories/IRobotsRepository";
 import { db } from "..";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import {
+  NodePgDatabase,
+  NodePgQueryResultHKT,
+} from "drizzle-orm/node-postgres";
 import { Robot } from "@/domain/entities/Robot";
 import { robotsTable } from "../schema/robot";
-import { eq } from "drizzle-orm";
+import { eq, ExtractTablesWithRelations } from "drizzle-orm";
+import { PgTransaction } from "drizzle-orm/pg-core";
 
 type RobotRow = {
   id: number;
@@ -19,20 +23,40 @@ export class RobotsRepository implements IRobotsRepository {
     this.db = db();
   }
 
-  async getAvailableRobot(): Promise<Robot | null> {
-    const rows = await this.db
+  async getAvailableRobot(
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Robot | null> {
+    const exec = tx ?? this.db;
+
+    const rows = await exec
       .select()
       .from(robotsTable)
       .where(eq(robotsTable.status, "available"))
-      .limit(1);
+      .limit(1)
+      .for("update", { skipLocked: true });
+
     if (rows.length === 0) return null;
 
     const row = rows[0];
     return this.mapRowToRobot(row);
   }
 
-  async updateRobot(robot: Robot, id: number): Promise<Robot> {
-    const updatedRobots = await this.db
+  async updateRobot(
+    robot: Robot,
+    id: number,
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Robot> {
+    const exec = tx ?? this.db;
+
+    const updatedRobots = await exec
       .update(robotsTable)
       .set({
         lastKnownLocation: robot.getLastKnownLocation(),
@@ -48,11 +72,21 @@ export class RobotsRepository implements IRobotsRepository {
     return this.mapRowToRobot(updatedRobot);
   }
 
-  async getRobot(id: number): Promise<Robot | null> {
-    const rows = await this.db
+  async getRobot(
+    id: number,
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Robot | null> {
+    const exec = tx ?? this.db;
+
+    const rows = await exec
       .select()
       .from(robotsTable)
-      .where(eq(robotsTable.id, id));
+      .where(eq(robotsTable.id, id))
+      .for("update");
 
     if (rows.length === 0) return null;
     const row = rows[0];

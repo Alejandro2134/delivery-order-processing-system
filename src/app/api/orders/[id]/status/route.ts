@@ -3,6 +3,7 @@ import { ClientsRepository } from "@/infrastructure/db/orm/drizzle/repositories/
 import { OrdersRepository } from "@/infrastructure/db/orm/drizzle/repositories/OrdersRepository";
 import { RestaurantsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RestaurantsRepository";
 import { RobotsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RobotsRepository";
+import { TransacionsRepository } from "@/infrastructure/db/orm/drizzle/repositories/TransactionsRepository";
 
 export async function PATCH(
   _request: Request,
@@ -15,11 +16,13 @@ export async function PATCH(
     const robotsRepository = new RobotsRepository();
     const clientsRepository = new ClientsRepository();
     const restaurantsRepository = new RestaurantsRepository();
+    const transactionsRepository = new TransacionsRepository();
     const ordersController = new OrdersController(
       ordersRepository,
       robotsRepository,
       clientsRepository,
-      restaurantsRepository
+      restaurantsRepository,
+      transactionsRepository
     );
     const order = await ordersController.changeStatus(orderId);
     return Response.json(order, { status: 200 });
