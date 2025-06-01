@@ -5,4 +5,5 @@ export interface IOrdersRepository {
   createOrder(order: Order): Promise<Order>;
   getOrder(id: number, tx?: unknown): Promise<Order | null>;
   updateOrder(order: Order, id: number, tx?: unknown): Promise<Order>;
+  getPendingOrder(tx?: unknown): Promise<Order | null>;
 }

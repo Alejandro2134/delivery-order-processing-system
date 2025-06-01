@@ -49,6 +49,28 @@ export class OrdersRepository implements IOrdersRepository {
     this.db = db();
   }
 
+  async getPendingOrder(
+    tx?: PgTransaction<
+      NodePgQueryResultHKT,
+      Record<string, never>,
+      ExtractTablesWithRelations<Record<string, never>>
+    >
+  ): Promise<Order | null> {
+    const exec = tx ?? this.db;
+
+    const rows = await exec
+      .select()
+      .from(ordersTable)
+      .where(eq(ordersTable.status, "pending"))
+      .limit(1)
+      .for("update", { skipLocked: true });
+
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    return this.mapRowToOrder({ orders: row });
+  }
+
   async updateOrder(
     order: Order,
     id: number,

@@ -27,6 +27,7 @@ describe("Create order use case", () => {
       getOrder: jest.fn(),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const clientsRepository: IClientsRepository = {
@@ -60,6 +61,7 @@ describe("Create order use case", () => {
       getOrder: jest.fn(),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const clientsRepository: IClientsRepository = {
@@ -97,6 +99,7 @@ describe("Create order use case", () => {
       getOrder: jest.fn(),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const clientsRepository: IClientsRepository = {
