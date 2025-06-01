@@ -15,6 +15,7 @@ describe("Get orders use case", () => {
       getOrder: jest.fn(),
       getOrders: jest.fn().mockResolvedValue(orders),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const useCase = new GetOrders(ordersRepository);

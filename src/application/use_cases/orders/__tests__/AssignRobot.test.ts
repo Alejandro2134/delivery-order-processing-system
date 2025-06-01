@@ -16,6 +16,7 @@ describe("Assign robot to order use case", () => {
       updateOrder: jest.fn().mockResolvedValue(order),
       createOrder: jest.fn(),
       getOrders: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const robotsRepository: IRobotsRepository = {
@@ -57,6 +58,7 @@ describe("Assign robot to order use case", () => {
       updateOrder: jest.fn(),
       createOrder: jest.fn(),
       getOrders: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const robotsRepository: IRobotsRepository = {
@@ -95,6 +97,7 @@ describe("Assign robot to order use case", () => {
       updateOrder: jest.fn(),
       createOrder: jest.fn(),
       getOrders: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const robotsRepository: IRobotsRepository = {
@@ -132,6 +135,7 @@ describe("Assign robot to order use case", () => {
       updateOrder: jest.fn(),
       createOrder: jest.fn(),
       getOrders: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
 
     const robotsRepository: IRobotsRepository = {

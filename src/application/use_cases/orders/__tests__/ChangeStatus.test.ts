@@ -18,6 +18,7 @@ describe("Change status use case", () => {
       getOrder: jest.fn().mockResolvedValue(order),
       getOrders: jest.fn(),
       updateOrder: jest.fn().mockResolvedValue(order),
+      getPendingOrder: jest.fn(),
     };
     const robotsRepository: IRobotsRepository = {
       createRobot: jest.fn(),
@@ -59,6 +60,7 @@ describe("Change status use case", () => {
       getOrder: jest.fn().mockResolvedValue(order),
       getOrders: jest.fn(),
       updateOrder: jest.fn().mockResolvedValue(order),
+      getPendingOrder: jest.fn(),
     };
     const robotsRepository: IRobotsRepository = {
       createRobot: jest.fn(),
@@ -97,6 +99,7 @@ describe("Change status use case", () => {
       getOrder: jest.fn().mockResolvedValue(null),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
     const robotsRepository: IRobotsRepository = {
       createRobot: jest.fn(),
@@ -133,6 +136,7 @@ describe("Change status use case", () => {
       getOrder: jest.fn().mockResolvedValue(order),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
     const robotsRepository: IRobotsRepository = {
       createRobot: jest.fn(),
@@ -168,6 +172,7 @@ describe("Change status use case", () => {
       getOrder: jest.fn().mockResolvedValue(order),
       getOrders: jest.fn(),
       updateOrder: jest.fn(),
+      getPendingOrder: jest.fn(),
     };
     const robotsRepository: IRobotsRepository = {
       createRobot: jest.fn(),
