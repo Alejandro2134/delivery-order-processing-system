@@ -1,12 +1,12 @@
 import { IOrdersRepository } from "@/domain/repositories/IOrdersRepository";
-import { Order } from "@/domain/entities/Order";
+import { IOrderFilter, Order } from "@/domain/entities/Order";
 import {
   NodePgDatabase,
   NodePgQueryResultHKT,
 } from "drizzle-orm/node-postgres";
 import { ordersTable } from "../schema/order";
 import { orderItemsTable } from "../schema/orderItems";
-import { eq, ExtractTablesWithRelations } from "drizzle-orm";
+import { and, eq, ExtractTablesWithRelations, ilike } from "drizzle-orm";
 import { db } from "..";
 import { clientsTable } from "../schema/client";
 import { restaurantTable } from "../schema/restaurant";
@@ -194,8 +194,19 @@ export class OrdersRepository implements IOrdersRepository {
     return getOrder;
   }
 
-  async getOrders(): Promise<Order[]> {
+  async getOrders(filter: IOrderFilter): Promise<Order[]> {
     try {
+      const whereClauses = [];
+
+      if (filter.client)
+        whereClauses.push(ilike(clientsTable.firstName, `${filter.client}`));
+      if (filter.restaurant)
+        whereClauses.push(ilike(restaurantTable.name, `${filter.restaurant}`));
+      if (filter.status)
+        whereClauses.push(eq(ordersTable.status, filter.status));
+      if (filter.robot)
+        whereClauses.push(ilike(robotsTable.robotId, `${filter.robot}`));
+
       const rows = await this.db
         .select({
           orders: { ...ordersTable },
@@ -223,6 +234,7 @@ export class OrdersRepository implements IOrdersRepository {
           eq(ordersTable.restaurantId, restaurantTable.id)
         )
         .leftJoin(robotsTable, eq(ordersTable.robotId, robotsTable.id))
+        .where(and(...whereClauses))
         .orderBy(ordersTable.id);
 
       const ordersMap = new Map<number, Order>();

@@ -1,4 +1,4 @@
-import { Robot } from "@/domain/entities/Robot";
+import { IRobotFilter, Robot } from "@/domain/entities/Robot";
 import { IRobotsRepository } from "@/domain/repositories/IRobotsRepository";
 
 export class GetRobots {
@@ -8,7 +8,7 @@ export class GetRobots {
     this.robotsRepository = robotsRepository;
   }
 
-  async execute(): Promise<Robot[]> {
-    return await this.robotsRepository.getRobots();
+  async execute(filter: IRobotFilter): Promise<Robot[]> {
+    return await this.robotsRepository.getRobots(filter);
   }
 }

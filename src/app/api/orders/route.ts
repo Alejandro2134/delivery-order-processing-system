@@ -7,7 +7,14 @@ import { ClientsRepository } from "@/infrastructure/db/orm/drizzle/repositories/
 import { RestaurantsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RestaurantsRepository";
 import { TransacionsRepository } from "@/infrastructure/db/orm/drizzle/repositories/TransactionsRepository";
 
-export async function GET() {
+type OrderStatus =
+  | "pending"
+  | "assigned"
+  | "picked_up"
+  | "delivered"
+  | "completed";
+
+export async function GET(request: Request) {
   try {
     const ordersRepository = new OrdersRepository();
     const robotsRepository = new RobotsRepository();
@@ -21,12 +28,33 @@ export async function GET() {
       restaurantsRepository,
       transactionsRepository
     );
-    const orders = await ordersController.list();
+
+    const { searchParams } = new URL(request.url);
+    const orders = await ordersController.list({
+      client: searchParams.get("client") || undefined,
+      restaurant: searchParams.get("restaurant") || undefined,
+      robot: searchParams.get("robot") || undefined,
+      status: (searchParams.get("status") as OrderStatus) || undefined,
+    });
     return Response.json(orders, { status: 200 });
   } catch (err: unknown) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Unexpected Error";
-    return Response.json({ error: errorMessage }, { status: 400 });
+    let errorMessage: string = "Unexpected Error";
+    let zodIssues: z.ZodIssue[] = [];
+    let statusCode = 500;
+
+    if (err instanceof z.ZodError) {
+      errorMessage = "Invalid query params";
+      statusCode = 400;
+      zodIssues = err.issues;
+    } else if (err instanceof Error) {
+      errorMessage = err.message;
+      statusCode = 400;
+    }
+
+    return Response.json(
+      { error: errorMessage, issues: zodIssues },
+      { status: statusCode }
+    );
   }
 }
 

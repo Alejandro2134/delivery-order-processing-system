@@ -6,12 +6,19 @@ import { CreateOrder } from "@/application/use_cases/orders/CreateOrder";
 import { AssignRobot } from "@/application/use_cases/orders/AssignRobot";
 import { IRobotsRepository } from "@/domain/repositories/IRobotsRepository";
 import { ChangeStatus } from "@/application/use_cases/orders/ChangeStatus";
-import { OrderAPI, orderSchema } from "../validators/order.schema";
+import {
+  OrderAPI,
+  OrderAPIFilter,
+  orderFilterSchema,
+  orderSchema,
+} from "../validators/order.schema";
 import { IClientsRepository } from "@/domain/repositories/IClientsRepository";
 import { IRestaurantsRepository } from "@/domain/repositories/IRestaurantsRepository";
 import { ITransactionsRepository } from "@/domain/repositories/ITransactionsRepository";
 
-export class OrdersController implements CommonOperations<Order, OrderAPI> {
+export class OrdersController
+  implements CommonOperations<Order, OrderAPI, OrderAPIFilter>
+{
   private ordersRepository: IOrdersRepository;
   private robotsRepository: IRobotsRepository;
   private clientsRepository: IClientsRepository;
@@ -68,8 +75,9 @@ export class OrdersController implements CommonOperations<Order, OrderAPI> {
     );
   }
 
-  list(): Promise<Order[]> {
+  list(filter: OrderAPIFilter): Promise<Order[]> {
+    const validatedFilter = orderFilterSchema.parse(filter);
     const getOrders = new GetOrders(this.ordersRepository);
-    return getOrders.execute();
+    return getOrders.execute(validatedFilter);
   }
 }

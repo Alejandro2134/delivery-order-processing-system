@@ -24,6 +24,13 @@ export type OrderStatus =
   | "delivered"
   | "completed";
 
+export interface IOrderFilter {
+  client?: string;
+  restaurant?: string;
+  status?: OrderStatus;
+  robot?: string;
+}
+
 const STATE_MAP = {
   pending: new PendingState(),
   assigned: new AssignedState(),

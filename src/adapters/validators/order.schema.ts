@@ -12,4 +12,14 @@ export const orderSchema = z.object({
   items: z.array(orderItemSchema).min(1),
 });
 
+export const orderFilterSchema = z.object({
+  client: z.string().optional(),
+  restaurant: z.string().optional(),
+  status: z
+    .enum(["pending", "assigned", "picked_up", "delivered", "completed"])
+    .optional(),
+  robot: z.string().optional(),
+});
+
 export type OrderAPI = z.infer<typeof orderSchema>;
+export type OrderAPIFilter = z.infer<typeof orderFilterSchema>;

@@ -4,9 +4,9 @@ import {
   NodePgDatabase,
   NodePgQueryResultHKT,
 } from "drizzle-orm/node-postgres";
-import { Robot } from "@/domain/entities/Robot";
+import { IRobotFilter, Robot } from "@/domain/entities/Robot";
 import { robotsTable } from "../schema/robot";
-import { eq, ExtractTablesWithRelations } from "drizzle-orm";
+import { eq, ExtractTablesWithRelations, and, ilike } from "drizzle-orm";
 import { PgTransaction } from "drizzle-orm/pg-core";
 
 type RobotRow = {
@@ -94,10 +94,21 @@ export class RobotsRepository implements IRobotsRepository {
     return this.mapRowToRobot(row);
   }
 
-  async getRobots(): Promise<Robot[]> {
+  async getRobots(filter: IRobotFilter): Promise<Robot[]> {
+    const whereClauses = [];
+
+    if (filter.lastKnownLocation)
+      whereClauses.push(
+        ilike(robotsTable.lastKnownLocation, `${filter.lastKnownLocation}`)
+      );
+    if (filter.robot)
+      whereClauses.push(ilike(robotsTable.robotId, `${filter.robot}`));
+    if (filter.status) whereClauses.push(eq(robotsTable.status, filter.status));
+
     const rows = await this.db
       .select()
       .from(robotsTable)
+      .where(and(...whereClauses))
       .orderBy(robotsTable.id);
 
     return rows.map((row) => {
