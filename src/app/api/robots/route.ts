@@ -3,7 +3,9 @@ import { OrdersRepository } from "@/infrastructure/db/orm/drizzle/repositories/O
 import { RobotsRepository } from "@/infrastructure/db/orm/drizzle/repositories/RobotsRepository";
 import { TransacionsRepository } from "@/infrastructure/db/orm/drizzle/repositories/TransactionsRepository";
 
-export async function GET() {
+type RobotStatus = "offline" | "busy" | "available";
+
+export async function GET(request: Request) {
   try {
     const robotsRepository = new RobotsRepository();
     const ordersRepository = new OrdersRepository();
@@ -13,7 +15,13 @@ export async function GET() {
       ordersRepository,
       transactionsRepository
     );
-    const robots = await robotsController.list();
+
+    const { searchParams } = new URL(request.url);
+    const robots = await robotsController.list({
+      lastKnownLocation: searchParams.get("lastKnownLocation") || undefined,
+      robot: searchParams.get("robot") || undefined,
+      status: (searchParams.get("status") as RobotStatus) || undefined,
+    });
     return Response.json(robots, { status: 200 });
   } catch (err: unknown) {
     const errorMessage =

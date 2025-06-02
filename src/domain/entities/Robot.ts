@@ -4,6 +4,12 @@ interface IRobot {
   robotId: string;
 }
 
+export interface IRobotFilter {
+  lastKnownLocation?: string;
+  robot?: string;
+  status?: RobotStatus;
+}
+
 export class Robot {
   private id: number;
   private robotId: string;

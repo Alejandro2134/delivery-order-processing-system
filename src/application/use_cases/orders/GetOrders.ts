@@ -1,4 +1,4 @@
-import { Order } from "@/domain/entities/Order";
+import { IOrderFilter, Order } from "@/domain/entities/Order";
 import { IOrdersRepository } from "@/domain/repositories/IOrdersRepository";
 
 export class GetOrders {
@@ -8,7 +8,7 @@ export class GetOrders {
     this.ordersRepository = ordersRepository;
   }
 
-  async execute(): Promise<Order[]> {
-    return await this.ordersRepository.getOrders();
+  async execute(filter: IOrderFilter): Promise<Order[]> {
+    return await this.ordersRepository.getOrders(filter);
   }
 }

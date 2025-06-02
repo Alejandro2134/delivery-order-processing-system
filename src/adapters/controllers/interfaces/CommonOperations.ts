@@ -1,4 +1,4 @@
-export interface CommonOperations<T, TAPI> {
-  list(): Promise<T[]>;
+export interface CommonOperations<T, TAPI, TAPIFilter> {
+  list(filter: TAPIFilter): Promise<T[]>;
   create(item: TAPI): Promise<T>;
 }

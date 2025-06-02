@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment, ChangeEvent, useCallback } from "react";
 
 type Order = {
   id: number;
@@ -15,11 +15,25 @@ type Order = {
   items: { description: string; unitPrice: string; quantity: number }[];
 };
 
+type Filter = {
+  [filter: string]: string;
+  client: string;
+  restaurant: string;
+  status: string;
+  robot: string;
+};
+
 const OrderTable = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [reload, setReload] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
+  const [filters, setFilters] = useState<Filter>({
+    client: "",
+    restaurant: "",
+    robot: "",
+    status: "",
+  });
 
   const assignRobot = async (orderId: number) => {
     try {
@@ -55,11 +69,16 @@ const OrderTable = () => {
     }
   };
 
-  const fetchOrders = async () => {
-    const res = await fetch("/api/orders");
+  const fetchOrders = useCallback(async () => {
+    const params = new URLSearchParams();
+
+    for (const filter in filters)
+      if (filters[filter]) params.append(filter, filters[filter]);
+
+    const res = await fetch(`/api/orders?${params.toString()}`);
     const data = await res.json();
     setOrders(data);
-  };
+  }, [filters]);
 
   const toggleExpand = (orderId: number) => {
     setExpandedOrders((prev) =>
@@ -78,13 +97,66 @@ const OrderTable = () => {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchOrders();
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [filters, fetchOrders]);
 
   return (
     <div className="overflow-x-auto">
       {error && (
         <div className="bg-red-100 text-red-800 p-2 rounded mb-4">{error}</div>
       )}
+
+      <div className="mb-4 mt-1 ml-1 mr-1 grid grid-cols-1 md:grid-cols-4 gap-2">
+        <input
+          type="text"
+          placeholder="Search Client"
+          className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={filters.client}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setFilters({ ...filters, client: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          placeholder="Search Restaurant"
+          className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={filters.restaurant}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setFilters({ ...filters, restaurant: e.target.value })
+          }
+        />
+        <select
+          className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          value={filters.status}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+            setFilters({ ...filters, status: e.target.value })
+          }
+        >
+          <option value="">Status</option>
+          <option value="pending">Pending</option>
+          <option value="assigned">Assigned</option>
+          <option value="picked_up">Picked Up</option>
+          <option value="delivered">Delivered</option>
+          <option value="completed">Completed</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Search Robot"
+          className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={filters.robot}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setFilters({ ...filters, robot: e.target.value })
+          }
+        />
+      </div>
 
       <table className="min-w-full bg-white border border-gray-200 shadow rounded-lg">
         <thead className="bg-gray-100">
