@@ -254,7 +254,7 @@ export class OrdersRepository implements IOrdersRepository {
       return Array.from(ordersMap.values());
     } catch (err) {
       console.log(err);
-      throw new Error("Error");
+      throw new Error("Internal server error");
     }
   }
 
