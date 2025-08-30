@@ -1,4 +1,4 @@
-# Kiwibot Challenge
+# Challenge
 
 # 😈 Application Overview
 
